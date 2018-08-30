@@ -85,14 +85,14 @@ var my_lodash = {
    */
   differenceBy: function (array, ...others) {
     let iteratee
-    if (!l_wj1995.isArray(others[others.length - 1])) {
+    if (!my_lodash.isArray(others[others.length - 1])) {
       iteratee = others.pop()
     } else {
-      iteratee = l_wj1995.identity
+      iteratee = my_lodash.identity
     }
-    let ary = [].concat(...others).map(arg => l_wj1995.iteratee(iteratee)(arg))
+    let ary = [].concat(...others).map(arg => my_lodash.iteratee(iteratee)(arg))
     return array.filter(item => {
-        return !ary.includes(l_wj1995.iteratee(iteratee)(item))
+        return !ary.includes(my_lodash.iteratee(iteratee)(item))
     })
   },
 
@@ -108,7 +108,7 @@ var my_lodash = {
     let ary =  [].concat(...others)
     return array.filter(it => {
         for (let i = 0; i < ary.length; i++) {
-            if (l_wj1995.iteratee(comparator)(it, ary[i])) {
+            if (my_lodash.iteratee(comparator)(it, ary[i])) {
                 return false
             }
         }
@@ -323,7 +323,7 @@ var my_lodash = {
   },
 
   /**
-   * 创建唯一值的数组，这个数组包含所有给定数组都包含的元素(交集)
+   * 创建唯一值的数组,这个数组包含所有给定数组都包含的元素(交集)
    * @param  {array} array    被筛选数组群
    * @return {array}          筛选出来的数组
    */
@@ -340,7 +340,7 @@ var my_lodash = {
   },
 
   /**
-   * 和 intersection 类似，通过 迭代器筛选
+   * 和 intersection 类似,通过 迭代器筛选
    * @param  {...array} array 被筛选数组群
    * @return {array}          筛选出来的数组
    */
@@ -368,7 +368,7 @@ var my_lodash = {
   },
 
   /**
-   * 和intersection类似，可自定义比较方式
+   * 和intersection类似,可自定义比较方式
    * @param  {...array} array 被筛选数组群
    * @return {array}          筛选出来的数组
    */
@@ -378,7 +378,7 @@ var my_lodash = {
     return paras[0].reduce(function (ary, val) {
       let onOff = my_lodash.reduce(others, function (me, cu) {
         for (let i = 0; i < cu.length; i++) {
-          if (comparator.call(my_lodash, val, cu[i])) {
+          if (comparator(val, cu[i])) {
             me = true
           }
         }
@@ -427,7 +427,7 @@ var my_lodash = {
   },
 
   /**
-   * 获取array数组的第n个元素。如果n为负数，则返回从数组结尾开始的第n个元素。
+   * 获取array数组的第n个元素。如果n为负数,则返回从数组结尾开始的第n个元素。
    * @param  {array}  array   数组对象
    * @param  {number} n = 0   数组下标
    * @return {*} value        返回的元素
@@ -490,7 +490,7 @@ var my_lodash = {
   },
 
   /**
-   * 和pullAllBy类似，自定义指定比较函数
+   * 和pullAllBy类似,自定义指定比较函数
    * @param  {array} array                       被操作的数组
    * @param  {*} values                          数组下标
    * @param  {function} [comparator]             自定义函数
@@ -499,7 +499,7 @@ var my_lodash = {
   pullAllWith: function (array, values, comparator) {
     my_lodash.each(values, function (element) {
       for (let i = 0; i < array.length; i++) {
-        if (comparator.call(my_lodash, element, array[i])) {
+        if (comparator(element, array[i])) {
           array.splice(i, 1)
           i--
         }
@@ -509,7 +509,7 @@ var my_lodash = {
   },
 
   /**
-   * 根据索引 indexes，移除array中对应的元素，并返回被移除元素的数组。
+   * 根据索引 indexes,移除array中对应的元素,并返回被移除元素的数组。
    * @param  {array}                array     被操作的数组
    * @param  {...(number|number[]}  indexes   数组下标
    * @return {array}                array     返回新数组
@@ -524,7 +524,7 @@ var my_lodash = {
   },
 
   /**
-   * 反转array，使得第一个元素变为最后一个元素，第二个元素变为倒数第二个元素，依次类推。 
+   * 反转array,使得第一个元素变为最后一个元素,第二个元素变为倒数第二个元素,依次类推。 
    * @param  {array}  array  原数组对象
    * @return {array}         反转后的数组
    */
@@ -533,7 +533,7 @@ var my_lodash = {
   },
 
   /**
-   * 裁剪数组array，从 start 位置开始到end结束，但不包括 end 本身的位置。 
+   * 裁剪数组array,从 start 位置开始到end结束,但不包括 end 本身的位置。 
    * @param  {array}   array                   原数组对象
    * @param  {number}  start = 0               开始位置
    * @param  {number}  end = array.length - 1  开始位置
@@ -544,7 +544,7 @@ var my_lodash = {
   },
 
   /**
-   * 使用二分法的方式检索来决定 value值 应该插入到数组中 尽可能小的索引位置，以保证array的排序。
+   * 使用二分法的方式检索来决定 value值 应该插入到数组中 尽可能小的索引位置,以保证array的排序。
    * @param  {array}   array    原数组对象
    * @param  {*}       value    插入值
    * @return {number}           插入位置
@@ -704,7 +704,7 @@ var my_lodash = {
   },
 
   /**
-   * 切割数组，从array数组的起始元素开始提取n个元素。
+   * 切割数组,从array数组的起始元素开始提取n个元素。
    * @param  {array}  array    待切割数组
    * @param  {number} n = 1    提取数量
    * @return {array}           提取元素的数组集合
@@ -714,7 +714,7 @@ var my_lodash = {
   },
 
   /**
-   * 切割数组，从array数组的最后一个原素开始提取n个元素。
+   * 切割数组,从array数组的最后一个原素开始提取n个元素。
    * @param  {array}  array    待切割数组
    * @param  {number} n = 1    提取数量
    * @return {array}           提取元素的数组集合
@@ -724,7 +724,7 @@ var my_lodash = {
   },
 
   /**
-   * 依据断言函数，从右向左提取数据
+   * 依据断言函数,从右向左提取数据
    * @param  {array} array                             被提取数组
    * @param  {function} predicate = my_lodash.identity 断言函数
    * @return {array}                                   提取后的数组
@@ -743,7 +743,7 @@ var my_lodash = {
   },
 
   /**
-   * 依据断言函数，提取数据
+   * 依据断言函数,提取数据
    * @param  {array} array                             被提取数组
    * @param  {function} predicate = my_lodash.identity 断言函数
    * @return {array}                                   提取后的数组
@@ -757,6 +757,64 @@ var my_lodash = {
       ary.push(array[i])
     }
     return ary
+  },
+
+  /**
+   * 创建一个按顺序排列的唯一值的数组。
+   * @param  {array} array   原数组
+   * @return {array}         筛选后的数组
+   */
+  union: function(arrays) {
+    let array = [], ary = []
+    for (let ii in arguments) array.push(...arguments[ii])
+    for (let i in array) {
+      if (ary.indexOf(array[i]) === -1) ary.push(array[i])
+    }
+    return ary
+  },
+
+  /**
+   * 通过迭代函数将数组集提取出成员,且不重复提取
+   * @param  {array} ...array    被提取的数组集
+   * @param  {function}          迭代函数
+   * @return {array}             提取后的数组
+   */
+  unionBy: function (...array) {
+    let iteratee
+    if (!my_lodash.isArray(array[array.length - 1])) {
+      iteratee = array.pop()
+    } else {
+      iteratee = my_lodash.identity
+    }
+    iteratee = my_lodash.iteratee(iteratee)
+    let ary = [].concat(...array)
+    return my_lodash.uniqBy(ary, iteratee)
+  },
+
+  /**
+   * 自定义函数将数组集提取出成员，且不重复提取
+   * @param  {array} ...arrays  被提取的数组集
+   * @param  {function}         对比函数
+   * @return {array}            提取后的数组
+   */
+  unionWith: function (...array) {
+    let iteratee
+    if (!my_lodash.isArray(array[array.length - 1])) {
+        iteratee = array.pop()
+    } else {
+        iteratee = my_lodash.identity
+    }
+    iteratee = my_lodash.iteratee(iteratee)
+    return my_lodash.uniqWith([].concat(...array), iteratee)
+  },
+
+  /**
+   * 创建一个按顺序排列的唯一值的数组。
+   * @param  {array} array   被筛选的数组
+   * @return {array}         筛选后的数组
+   */
+  uniq: function(array) {
+    return my_lodash.union(array)
   },
 
   /**
@@ -776,6 +834,216 @@ var my_lodash = {
       return ary
     }, [])
   },
+
+  /**
+   * 类似 uniqBy 通过迭代器筛选数组
+   * @param  {array} array                                           被筛选的数组
+   * @param  {function} comparator = my_lodash.iteratee(comparator)  迭代器
+   * @return {array}                                                 筛选后的数组
+   */
+  uniqWith: function (array, comparator = my_lodash.iteratee(comparator)) {
+    return array.reduce((res, item) => {
+        for (var i = 0; i < res.length; i++) {
+            if (comparator(item, res[i])) {
+                break
+            }
+        }
+        if (i === res.length) {
+            res.push(item)
+        }
+        return res
+    }, [array[0]])
+  },
+
+  /**
+   * 解压数组
+   * @param  {array} array 需要被解压的数组
+   * @return {array}       解压后的数组
+   */
+  unzip: function(array) {
+    let array = []
+    array.push(...arguments[0])
+    return my_lodash.zip(...array)
+  },
+
+  /**
+   * 通过迭代器解压数组
+   * @param  {array} array                         需要被解压的数组
+   * @param  {array} iteratee = my_lodash.identity 迭代函数
+   * @return {array}                               解压后的数组
+   */
+  unzipWith: function (array, iteratee = my_lodash.identity) {
+    let temp = my_lodash.zip(...array)
+    return my_lodash.map(temp, (it) => my_lodash.iteratee(iteratee)(...it))
+  },
+
+  /**
+   * 创建一个剔除所有给定值的新数组
+   * @param  {array}     array       原数组对象
+   * @param  {...values} values      需要剔除的值的数组集合
+   * @return {array}                 剔除值后的数组
+   */
+  without: function(array, values) {
+    let judge = [], ary = []
+    for (let i = 1; i < arguments.length; i++) judge.push(arguments[i])
+    for (let j in array) {
+      if (judge.indexOf(array[j]) === -1) ary.push(array[j])
+    }
+    return ary
+  },
+
+  /**
+   * 创建一个给定数组唯一值的数组,返回值的顺序取决于他们数组的出现顺序。
+   * @param  {array}     arg       原数组对象
+   * @return {array}               返回唯一值数组
+   */
+  xor: function(...array) {
+    return my_lodash.xorBy.call(this, ...array, it => it)
+  },
+
+  /**
+   * 通过迭代仅保留数组中出现一次的成员
+   * @param  {array} ...arrays 被检查的数组
+   * @return {array}           筛选出的数组
+   */
+  xorBy: function (...array) {
+    let iteratee
+    if (!my_lodash.isArray(array[array.length - 1])) {
+        iteratee = array.pop()
+    } else {
+       iteratee = my_lodash.identity
+    }
+    iteratee = my_lodash.iteratee(iteratee)
+    array = [].concat(...array)
+    var ary = array.map(item => item = iteratee(item))
+    ary = ary.map((item, index) => {
+        if (ary.indexOf(item) === ary.lastIndexOf(item)) {
+            return true
+        } else {
+            return false
+        }
+    })
+    return array.filter((item, index) => ary[index])
+  },
+
+  /**
+   * 通过自定义函数仅保留数组中出现一次的成员
+   * @param  {array} ...arrays 被检查的数组
+   * @return {array}           筛选出的数组
+   */
+  xorWith: function (...array) {
+    let iteratee
+    if (!my_lodash.isArray(array[array.length - 1])) {
+        iteratee = array.pop()
+    } else {
+       iteratee = my_lodash.identity
+    }
+    iteratee = my_lodash.iteratee(iteratee)
+    array = [].concat(...array)
+    return array.filter((item, index) => {
+        for (var i = 0; i < array.length; i++) {
+            if (i !== index && iteratee(item, array[i])) {
+                return false
+            }
+        }
+        return true
+    })
+  },
+
+  /**
+   * 创建一个分组元素的数组，数组的第一个元素包含所有给定数组的第一个元素，数组的第二个元素包含所有给定数组的第二个元素，以此类推。
+   * @param  {array}  arg   多个数组集合
+   * @return {object}       新的数组对象
+   */
+  zip: function(arg) {
+    let array = [], ary = [], len = 0
+    for (let i in arguments) {
+      arguments[i].length > len ? len = arguments[i].length : len = len
+      array.push(arguments[i])
+    }
+    for (i = 0; i < len; i++) {
+      ary[i] = []
+      ary[i].push(...(array => {
+        let ary = []
+        for (let i in array)  ary.push(array[i].shift())
+        return ary
+      })(array))
+    }
+    return ary
+  },
+
+  /**
+   * 将参数压缩成对象
+   * @param  {array} props = []  键
+   * @param  {array} values = [] 值
+   * @return {object}            压缩后的对象
+   */
+  zipObject: function(props = [], values = []) {
+    let map = {}
+    for (let i in props) map[props[i]] = values[i]
+    return map
+  },
+
+  /**
+   * 根据路径，将参数打包成对象
+   * @param  {array} props = []  路径
+   * @param  {array} values = [] 值
+   * @return {object}            打包后的对象
+   */
+  zipObjectDeep: function(props = [], values = []) {
+    let map = {}, judge = [], remap = {}
+    for (let i in props) {
+      let ary = []
+      ary = props[i].split(".")
+      for (let j = ary.length - 1; j >= 0; j--) {
+        if (ary[j].indexOf("[") != -1) {
+          let num = ary[j].slice(ary[j].indexOf("[") + 1,ary[j].indexOf("]"))
+          ary[j] = ary[j].slice(0,ary[j].indexOf("["))
+          if (!map[ary[j]]) map[ary[j]] = []
+          if (j === ary.length - 1) {
+            map[ary[j]][num] = values[i]
+          } else {
+              map[ary[j]][num] = {}
+              map[ary[j]][num][ary[j + 1]] = map[ary[j + 1]]
+          }
+        } else {
+            if (j === ary.length - 1) {
+              if (!map[ary[j]]) map[ary[j]] = {}
+              map[ary[j]] = values[i]
+            } else {
+              if (!map[ary[j]]) map[ary[j]] = {}
+              map[ary[j]][ary[j + 1]] = map[ary[j + 1]]
+            }
+        }
+        if (j === 0) {
+          judge.push(ary[j])
+        }
+      }    
+    }
+    for (let i in judge) {
+      remap[judge[i]] = map[judge[i]]
+    }
+    return remap
+  },
+
+  /**
+   * 根据迭代器 打包数组
+   * @param {array} ...array                    需要打包的数组
+   * @param {function} iteratee = this.identity 迭代器
+   * @return {array}                            打包后的数组
+   */
+  zipWith: function (...others) {
+    let iteratee
+    if (!my_lodash.isArray(others[others.length - 1])) {
+      iteratee = others.pop()
+    } else {
+      iteratee = my_lodash.identity
+    }
+    let ary = my_lodash.zip(...others)
+    return my_lodash.map(ary, val => iteratee(...val))
+  }
+
+
 
 
 
@@ -835,7 +1103,7 @@ var my_lodash = {
   /**
    * 检查传入的值是不是一个 数组
    * @param  {*}  value      被检查的对象
-   * @return {Boolean}       如果是 对象，返回 true
+   * @return {Boolean}       如果是 对象,返回 true
    */
   isArray: function (value) {
     return toString.call(value) === '[object Array]'
@@ -871,7 +1139,7 @@ var my_lodash = {
     customizer = customizer || my_lodash.isEqual
     let temp = Object.entries(source)
     return temp.every(function (it) {
-      return customizer.call(my_lodash, object[it[0]], it[1], it[0], object, source)
+      return customizer(object[it[0]], it[1], it[0], object, source)
     })
   },
 
