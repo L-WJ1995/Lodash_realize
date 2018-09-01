@@ -478,7 +478,7 @@ var my_lodash = {
    * @return {array}                                    操作后的值
    */
   pullAllBy: function (array, values, iteratee = my_lodash.identity) {
-    my_lodash.each(values, function (element) {
+    my_lodash.forEach(values, function (element) {
       for (let i = 0; i < array.length; i++) {
         if (my_lodash.isEqual(my_lodash.iteratee(iteratee)(element), my_lodash.iteratee(iteratee)(array[i]))) {
           array.splice(i, 1)
@@ -497,7 +497,7 @@ var my_lodash = {
    * @return {array}                             返回新数组
    */
   pullAllWith: function (array, values, comparator) {
-    my_lodash.each(values, function (element) {
+    my_lodash.forEach(values, function (element) {
       for (let i = 0; i < array.length; i++) {
         if (comparator(element, array[i])) {
           array.splice(i, 1)
@@ -792,7 +792,7 @@ var my_lodash = {
   },
 
   /**
-   * 自定义函数将数组集提取出成员，且不重复提取
+   * 自定义函数将数组集提取出成员,且不重复提取
    * @param  {array} ...arrays  被提取的数组集
    * @param  {function}         对比函数
    * @return {array}            提取后的数组
@@ -951,7 +951,7 @@ var my_lodash = {
   },
 
   /**
-   * 创建一个分组元素的数组，数组的第一个元素包含所有给定数组的第一个元素，数组的第二个元素包含所有给定数组的第二个元素，以此类推。
+   * 创建一个分组元素的数组,数组的第一个元素包含所有给定数组的第一个元素,数组的第二个元素包含所有给定数组的第二个元素,以此类推。
    * @param  {array}  arg   多个数组集合
    * @return {object}       新的数组对象
    */
@@ -985,7 +985,7 @@ var my_lodash = {
   },
 
   /**
-   * 根据路径，将参数打包成对象
+   * 根据路径,将参数打包成对象
    * @param  {array} props = []  路径
    * @param  {array} values = [] 值
    * @return {object}            打包后的对象
@@ -1043,12 +1043,932 @@ var my_lodash = {
     return my_lodash.map(ary, val => iteratee(...val))
   }
 
+  /**
+   * 创建一个对象，
+   * 将每个元素的迭代结果作为该对象的键名,该结果出现的次数,作为该对象的键值
+   * @param  {array | object} collection        被操作的集合
+   * @param  {function} iteratee= my_lodash.identity 迭代器
+   * @return {object}                           迭代出的结果
+   */
+  countBy: function (collection, iteratee = my_lodash.identity) {
+    return my_lodash.reduce(collection, function (ary, val) {
+      let key = my_lodash.iteratee(iteratee)(val)
+      if (key in ary) {
+        ary[key]++
+      } else {
+        ary[key] = 1
+      }
+      return ary
+    }, {})
+  },
 
+  /**
+   * 反方向遍历数组
+   * @param  {array | object} collection              被迭代的集合
+   * @param  {function} iteratee = my_lodash.identity 迭代器
+   * @return {*}                                      返回集合
+   */
+  forEachRight: function (collection, iteratee = my_lodash.identity) {
+    let keys = Object.keys(collection)
+    for (let i = keys.length - 1; i >= 0; i--) {
+      if (iteratee(collection[keys[i]], keys[i], collection) === false) {
+        return collection
+      }
+    }
+    return collection
+  },
 
+  /**
+   * 迭代集合元素,返回成员调用断言函数后为 true 的数组
+   * @param  {array | object} collection                     被迭代的对象
+   * @param  {function | object | array | string} predicate  断言
+   * @return {array}                                         筛选后的新数组
+   */
+  filter: function (collection, predicate = my_lodash.identity) {
+    predicate = my_lodash.iteratee(predicate)
+    return collection.reduce((ary, item, index) => {
+        if (predicate(item)) {
+            ary.push(item)
+        }
+        return ary
+    }, [])
+  },
 
+  /**
+   * 迭代集合元素,返回第一个 返回 true 的元素
+   * @param  {array | object} collection                被迭代的集合
+   * @param  {function} [predicate = this.identity]     判定条件
+   * @param  {Number} [fromIndex=0]                     判定起始位置
+   * @return {*}                                        第一个判定成功的元素
+   */
+  find: function (collection, predicate = my_lodash.identity, fromIndex = 0) {
+    for (let key in collection) {
+      if (my_lodash.isArray(collection)) {
+        if (key < fromIndex) {
+          continue
+        }
+      }
+      if (collection.hasOwnProperty(key)) {
+        if (my_lodash.iteratee(predicate)(collection[key], key, collection)) {
+          return collection[key]
+        }
+      }
+    }
+  },
 
+   /**
+   * 从右往左返回断言函数第一次返回 true 的元素的索引
+   * @param  {array} array                                被查找的数组
+   * @param  {function} [predicate = my_lodash.identity]  断言函数
+   * @param  {Number} [fromIndex = array.length - 1]      开始查找的位置
+   * @return {number}                                     索引
+   */
+  findLastIndex: function (array, predicate = my_lodash.identity, fromIndex = array.length - 1) {
+    for (let i = fromIndex; i >= 0; i--) {
+      if (my_lodash.iteratee(predicate)(array[i])) {
+        return i
+      }
+    }
+    return -1
+  },
 
+  /**
+   * 从右往左迭代成员,返回第一个满足的成员
+   * @param  {array | object} collection                  被迭代的集合
+   * @param  {function} predicate = my_lodash.identity     迭代器
+   * @param  {number} fromIndex = collection.length-1     索引起始位置
+   * @return {*}                                          满足条件的第一个成员,未找到返回 undefined
+   */
+  findLast: function (collection, predicate = my_lodash.identity, fromIndex = collection.length - 1) {
+    let keys = Object.keys(collection)
+    for (let i = fromIndex; i >= 0; i--) {
+      if (my_lodash.iteratee(predicate)(collection[keys[i]])) {
+        return collection[keys[i]]
+      }
+    }
+  },
 
+  /**
+   * 迭代集合成员,并将结果降一维
+   * @param  {array | object} collection              被迭代的集合
+   * @param  {function} iteratee = my_lodash.identity  迭代器
+   * @return {array}                                  处理后的数组
+   */
+  flatMap: function (collection, iteratee = my_lodash.identity) {
+    return my_lodash.flatMapDepth(collection, iteratee)
+  },
+
+  /**
+   * 迭代集合成员,并将结果降成一维
+   * @param  {array | object} collection              被迭代的集合
+   * @param  {function} iteratee = my_lodash.identity  迭代器
+   * @return {array}                                  处理后的数组
+   */
+  flatMapDeep: function (collection, iteratee = my_lodash.identity) {
+    return my_lodash.flatMapDepth(collection, iteratee, Infinity)
+  },
+
+  /**
+   * 迭代集合成员,并将结果降维,维度自定义
+   * @param  {array | object} collection    被迭代的集合
+   * @param  {function} iteratee            迭代器
+   * @param  {number} depth = 1             维度
+   * @return {array}                        处理后的数组
+   */
+  flatMapDepth: function (collection, iteratee, depth = 1) {
+    iteratee = my_lodash.iteratee(iteratee)
+    return collection.reduce((ary, item) => {
+        return ary.concat(my_lodash.flattenDepth(iteratee(item), depth - 1))
+    }, [])
+  },
+
+  /**
+   * 利用迭代期迭代集合,将迭代出来的结果作为键名,被迭代的成员作为键值
+   * @param  {array | object} collection              被迭代的集合
+   * @param  {function} iteratee = my_lodash.identity 迭代器
+   * @return {object}                                 新对象
+   */
+  groupBy: function (collection, iteratee = my_lodash.identity) {
+    return my_lodash.reduce(collection, function (obj, key) {
+      let tmp = my_lodash.iteratee(iteratee)(key)
+      if (tmp in obj) {
+        obj[tmp].push(key)
+      } else {
+        obj[tmp] = [key]
+      }
+      return obj
+    }, {})
+  },
+
+  /**
+   * 检查一个值是否都在集合中
+   * @param  {array | object | string} collection    被比较的集合
+   * @param  {*} value                               检查的值
+   * @param  {Number} [fromIndex = 0]                查找的索引
+   * @return {booleam}                               如果存在,返回 true
+   */
+  includes: function (collection, value, fromIndex = 0) {
+    let count = 0
+    for (let key in collection) {
+      if (count < fromIndex) {
+        count++
+        continue
+      }
+      if (collection.hasOwnProperty(key)) {
+        if (my_lodash.isEqual(collection[key], value)) {
+          return true
+        }
+      }
+    }
+    if (my_lodash.isString(collection) && my_lodash.isString(value)) {
+      let reg = new RegExp(value)
+      return reg.test(collection)
+    }
+    return false
+  },
+
+  /**
+   * 对集合中每一个元素调用方法,返回结果数组
+   * @param  {array | object} collection      被调用的集合
+   * @param  {array | function | string} path 调用方法的路径
+   * @param  {...*} ...args                   方法的参数
+   * @return {array}                          结果集
+   */
+  invokeMap: function (collection, path, ...args) {
+    return my_lodash.map(collection, function (it) {
+      if (my_lodash.isFunction(path)) {
+        return path.apply(it, args)
+      } else {
+        return my_lodash.propertyOf(it)(path).call(it, ...args)
+      }
+    })
+  },
+
+  /**
+   * 创建一个对象,键名是集合成员通过接待后的结果,键值是该成员
+   * @param  {array | object} collection              被迭代的集合
+   * @param  {function} iteratee = my_lodash.identity 迭代器
+   * @return {object}                                 生成的新对象
+   */
+  keyBy: function (collection, iteratee = my_lodash.identity) {
+    return my_lodash.reduce(collection, function (obj, key) {
+      obj[my_lodash.iteratee(iteratee)(key)] = key
+      return obj
+    }, {})
+  },
+
+  /**
+   * 迭代集合的每一个元素,通过调用 iteratee 返回一个新的数组
+   * @param  {array | object} collection    被迭代的集合
+   * @param  {function | string} iteratee   用于迭代的函数
+   * @return {array}                        返回一个新数组
+   */
+  map: function (collection, iteratee) {
+    let ary = []
+    for (let key in collection) {
+      if (collection.hasOwnProperty(key)) {
+        if (my_lodash.isString(iteratee)) {
+          ary.push(my_lodash.property(iteratee)(collection[key], key, collection))
+        } else if (my_lodash.isFunction(iteratee)) {
+          ary.push(iteratee(collection[key], key, collection))
+        }
+      }
+    }
+    return ary
+  },
+
+  /**
+   * 类似于 sortby 除了可以指定排序顺序
+   * @param  {array | object} collection                                                被排序的集合
+   * @param  {function[] | array[] | object[] | string[]} iteratee = my_lodash.identity 迭代器
+   * @param  {string} orders = "asc"                                                    顺序指令
+   * @return {array}                                                                    排序后的数组
+   */
+  orderBy: function (collection, iteratee = my_lodash.identity, orders = "asc") {
+    let ary = my_lodash.clone(collection)
+    for (let i = iteratee.length - 1; i >= 0; i--) {
+      ary.sort(function (a, b) {
+        let order = my_lodash.iteratee(iteratee[i])(a) > my_lodash.iteratee(iteratee[i])(b)
+        return orders[i] === 'asc' ? order : !order
+      })
+    }
+    return ary
+  },
+
+  /**
+   * 断言集合中的元素,并进行分组
+   * @param  {array | object} collection               被断言的集合
+   * @param  {function} predicate = my_lodash.identity 断言函数
+   * @return {array}                                   分组后的数组
+   */
+  partition: function (collection, predicate = my_lodash.identity) {
+    let ary = [[],[]]
+    return my_lodash.reduce(collection, function (topval, val) {
+      my_lodash.iteratee(predicate)(val) ? ary[0].push(val) : ary[1].push(val)
+      return ary
+    }, ary)
+  },
+
+  /**
+   * 类似reduce,不过从右往左迭代
+   * @param  {array | object} collection              别迭代的集合
+   * @param  {function} iteratee = my_lodash.identity 迭代器
+   * @param  {*} accumulator                          初始值
+   * @return {*}                                      迭代后的值
+   */
+  reduceRight: function (collection, iteratee = my_lodash.identity, accumulator) {
+    let keys = Object.keys(collection)
+    let result = accumulator || collection[keys[0]]
+    for (let i = accumulator ? keys.length - 1 : keys.length - 2; i >= 0; i--) {
+      result = iteratee(result, collection[keys[i]], keys[i], collection)
+    }
+    return result
+  },
+
+  /**
+   * 和 filter 相反,收集断言失败的函数
+   * @param  {array | object} collection               被断言的集合
+   * @param  {function} predicate = my_lodash.identity 断言函数
+   * @return {array}                                   收集的集合
+   */
+  reject: function (collection, predicate = my_lodash.identity) {
+    let result = []
+    for (let key in collection) {
+      if (collection.hasOwnProperty(key)) {
+        if (!my_lodash.iteratee(predicate)(collection[key], key, collection)) {
+          result.push(collection[key])
+        }
+      }
+    }
+    return result
+  },
+
+  /**
+   * 随机选取一个成员
+   * @param  {array | object} collection 待选集合
+   * @return {array}                     选中成员数组
+   */
+  sample: function(collection) {
+    let ary = Object.keys(collection), index = Math.floor(Math.random() * ary.length)
+    return collection[ary[index]]
+  },
+
+  /**
+   * 随机选取一组成员
+   * @param  {array | object} collection 待选集合
+   * @param  {number}                    选取成员的个数
+   * @return {array}                     选中成员数组
+   */
+  sampleSize: function(collection,n = 1) {
+    let ary = Object.keys(collection), indexval, index = [], result = []
+    for (let i = 1; i <= (n > ary.length ? ary.length : n); i++) {
+      do {
+        indexval = Math.floor(Math.random() * ary.length)
+      } while (index.indexOf(indexval) != -1)
+      index.push(indexval)
+      result.push(collection[ary[indexval]])
+    }
+    return result
+  },
+
+  /**
+   * 通过Fisher - Yates随机打乱数组
+   * @param  {array | object} collection 待打乱集合
+   * @return {array | object}            打乱后的数组
+   */
+  shuffle: function (collection) {
+    let result = Object.keys(collection)
+    let size = result.length
+    let index
+    result.forEach(function (func, i, array) {
+      index = ~~(Math.random() * (size - i - 1)) + i
+      array.splice(i, 1, array[index])
+      array.splice(index, 1, func)
+    })
+    return my_lodash.map(result, it => collection[it])
+  },
+
+    /**
+   * 返回集合的长度
+   * @param  {array | string | object} collection 被统计的对象
+   * @return {number}                             统计后的长度
+   */
+  size: function (collection) {
+    let count = 0
+    for (let key in collection) {
+      if (collection.hasOwnProperty(key)) {
+        count++
+      }
+    }
+    return count
+  },
+
+  /**
+   * 使用迭代器检查集合成员是否满足条件,一旦满足,返回 true
+   * @param  {array | object} collection                被检查的对象
+   * @param  {function} [predicate = my_lodash.identity]       迭代器
+   * @return {boolean}                                  一旦满足,返回 true
+   */
+  some: function (collection, predicate = my_lodash.identity) {
+    for (let key in collection) {
+      if (collection.hasOwnProperty(key)) {
+        if (my_lodash.iteratee(predicate)(collection[key], key, collection)) {
+          return true
+        }
+      }
+    }
+    return false
+  },
+
+  /**
+   * 返回一个以升序排序后的数组
+   * @param  {array} collection                      被排序的对象
+   * @param  {Array}  [iteratee = [my_lodash.identity]] 判断条件集合
+   * @return {array}                                 排序后的新数组
+   */
+  sortBy: function (collection, iteratee = [my_lodash.identity]) {
+    let result = []
+    for (let i = 0; i < collection.length; i++) {
+      result.push(my_lodash.assign({}, collection[i]))
+    }
+    if (my_lodash.isFunction(iteratee)) {
+      result.sort(function (a, b) {
+        return my_lodash.iteratee(iteratee)(a) > my_lodash.iteratee(iteratee)(b)
+      })
+    } else {
+      for (let i = 0; i < iteratee.length; i++) {
+        result.sort(function (a, b) {
+          return my_lodash.iteratee(iteratee[i])(a) > my_lodash.iteratee(iteratee[i])(b)
+        })
+      }
+    }
+    return result
+  },
+
+  /**
+   * 返回从 1970 1.1 00：00：00 UTC 至今的毫秒数
+   */
+  now: function () {
+    return Date.now()
+  },
+
+  /**
+   * func 在第 n 次调用后才会执行
+   * @param  {number} n      约定第几次开始执行函数 func
+   * @param  {function} func 被约束的函数
+   * @return {function}      新的函数
+   */
+  after: function (n, func) {
+    let count = 0
+    return function (...args) {
+      count++
+      if (count >= n) {
+        return func(...args)
+      }
+    }
+  },
+
+  /**
+   * 返回一个新函数来限制调用函数的参数数量
+   * @param  {function} func        被限制的函数
+   * @param  {number} n=func.length 被限制参数的数量
+   * @return {function}             返回新的函数
+   */
+  ary: function (func, n = func.length) {
+    return function (...args) {
+      args.length = n
+      return func(...args)
+    }
+  },
+
+  /**
+   * 限制函数的调用的函数,让函数只能被调用有限次数（n 次）
+   * 当 限制次数为 0 时,被限制的函数不会被调用， 返回 undefined
+   * @param  {number} n      指定被限制调用的次数
+   * @param  {function} func 指定被限制调用的函数
+   * @return {function}      新的被限制调用的函数
+   */
+  before: function (n, func) {
+    let count = 0
+    let result
+    return function (...arg) {
+      count++
+      if (count <= n) {
+        result = func(...arg)
+      }
+      return result
+    }
+  },
+
+  /**
+   * 绑定 this 和部分参数给 被调用函数,使得 func 在 绑定的 this 的上下文环境被调用,并固定部分参数
+   * @param  {function}  func     被绑定的函数
+   * @param  {*} thisArg          被绑定函数执行的上下文
+   * @param  {...*}  partials     被绑定的参数
+   * @return {function}           绑定后的新函数
+   */
+  bind: function (func, thisArg, ...partials) {
+    return function (...args) {
+      partials = my_lodash.map(partials, function (a) {
+        if (a === _) {
+          a = args.shift()
+        }
+        return a
+      })
+      return func.call(thisArg, ...partials, ...args)
+    }
+  },
+
+  /**
+   * 返回一个函数,调用对象的方法
+   * @param  {object} object         被调用方法所附的对象
+   * @param  {string} key            方法名
+   * @param  {partials} ...partials  绑定的参数
+   * @return {function}              返回新的函数
+   */
+  bindKey: function (object, key, ...partials) {
+    return function (...args) {
+      partials = partials.map(function (it) {
+        if (it === _) {
+          it = args.shift()
+        }
+        return it
+      })
+      return object[key](...partials, ...args)
+    }
+  },
+
+  /**
+   * curry函数
+   * @param  {function} func              需要柯里化的函数
+   * @param  {number} arity = func.length 指定参数数量
+   * @return {function}                   柯里化后的函数
+   */
+  curry: function (func, arity = func.length) {
+    let len
+    return function fn(...args) {
+      len = my_lodash.reduce(args, function (length, val) {
+        if (val === _) {
+          return length
+        }
+        return ++length
+      }, 0)
+      if (len < arity) {
+        return my_lodash.partial(fn, ...args)
+      } else {
+        return func(...args)
+      }
+    }
+  },
+
+  /**
+   * 反向curry函数
+   * @param  {function} func              需要柯里化的函数
+   * @param  {number} arity = func.length 指定参数数量
+   * @return {function}                   柯里化后的函数
+   */
+  curryRight: function (func, arity = func.length) {
+    let len
+    return function fn(...args) {
+      len = my_lodash.reduce(args, function (length, val) {
+        if (val === _) {
+          return length
+        }
+        return ++length
+      }, 0)
+      if (len < arity) {
+        return my_lodash.partialRight(fn, ...args)
+      } else {
+        return func(...args)
+      }
+    }
+  },
+
+  debounce: function (func, wait = 0, options = {}) {
+    let lastTimer = my_lodash.now()
+    return function () {
+      let currTimer = my_lodash.now()
+      if (currTimer - lastTimer >= wait) {
+        lastTimer = currTimer
+        return func()
+      } else {
+        lastTimer = currTimer
+      }
+    }
+  },
+
+  throttle: function (func, wait = 0, options = {}) {
+    let lastTimer = my_lodash.now()
+    return function () {
+      let currTimer = my_lodash.now()
+      if (currTimer - lastTimer >= wait) {
+        lastTimer = currTimer
+        return func()
+      }
+    }
+  },
+
+  /**
+   * 等待当前调用栈清空后调用函数,并可以传给该函数参数
+   * @param  {function} func 被调用函数
+   * @param  {...*} args     传入的参数
+   * @return {number}        id
+   */
+  defer: function (func, ...args) {
+    return setTimeout(func.bind(this, ...args, 0))
+  },
+
+  /**
+   * 延时调用函数
+   * @param  {function} func 延时调用函数
+   * @param  {number} wait   延时时间
+   * @param  {...*} args     传入函数的参数
+   * @return {number}        id
+   */
+  delay: function (func, wait, ...args) {
+    return setTimeout(func.bind(this, ...args), wait)
+  },
+
+  /**
+   * 将值强行转换为数组
+   * @param {*} value  待转换的值
+   * @returns {array}  转换后的数组
+   */
+  castArray: function (value) {
+    if (my_lodash.isArray(value)) {
+      return value
+    } else if (arguments.length === 0) {
+      return []
+    } else {
+      return [value]
+    }
+  },
+
+  /**
+   * 通过 source 方法,检查 object 是否满足条件
+   * @param {object} object 被判断的对象
+   * @param {object} source 判断条件安
+   * @returns {boolean}     满足,返回 true
+   */
+  conformsTo: function (object, source) {
+    for (let key in source) {
+      if (source.hasOwnProperty(key)) {
+        if (!source[key](object[key])) {
+          return false
+        }
+      }
+    }
+    return true
+  },
+
+  /**
+   * 判断两个值是否浅相等
+   * NaN 与 NaN 相等
+   * @param {*} value 第一个值
+   * @param {*} other 第二个值
+   * @returns {bolean} 相等,返回 true
+   */
+  eq: function(value, other) {
+    return value === other || (value !== value && other !== other)
+  },
+
+  /**
+   * 判断第一个值是否大于第二个值
+   * @param {*} value 第一个值
+   * @param {*} other 第二个值
+   * @returns {boolean} 大于,返回 true
+   */
+  gt: function(value, other) {
+    return value > other ? true : false
+  },
+
+  /**
+   * 判断第一个值是否大于等于第二个值
+   * @param {*} value 第一个值
+   * @param {*} other 第二个值
+   * @returns {boolean} 大于,返回 true
+   */
+  gte: function(value, other) {
+    return value >= other ? true : false
+  },
+
+  /**
+   * 检查传入的值是不是一个 arguments 对象
+   * @param  {*}  value      被检查的对象
+   * @return {Boolean}       如果是 arguments 对象,返回 true
+   */
+  isArguments: function(value) {
+    return Object.prototype.toString.call(value) === "[object Arguments]" ? true : false
+  },
+
+  /**
+   * 检查一个值是不是 ArrayBuffer 对象
+   * @param  {*}  value      需要检查的值
+   * @return {Boolean}       如果是 ArrayBuffer 对象,返回 true
+   */
+  isArrayBuffer: function (value) {
+    return toString.call(value) === '[object ArrayBuffer]'
+  },
+
+  /**
+   * 检查一个对象是否是类数组对象,包括 string ，（string 含有 length 属性,函数不是类数组对象）
+   * @param  {*}  value      被检查的对象
+   * @return {Boolean}       如果是 类数组对象,返回 true
+   */
+  isArrayLike: function(value) {
+    return value && typeof value != "function" && isFinite(value.length) && value.length >= 0 && value.length === Math.floor(value.length) &&  value.length < 4294967296          
+  },
+
+  /**
+   * 检查一个对象是否是类数组对象,不包括 string 和 function
+   * @param  {*}  value      被检查的对象
+   * @return {Boolean}       如果是 类数组对象,返回 true
+   */
+  isArrayLikeObject: function(value) {
+    return value && typeof value === "object" && isFinite(value.length) && value.length >= 0 && value.length === Math.floor(value.length) &&  value.length < 4294967296          
+  },
+
+  /**
+   * 检查 传入的值 是否是布尔值
+   * @param  {*}  value      被检查的对象
+   * @return {Boolean}       如果是布尔值。返回 true
+   */
+  isBoolean: function(value) {
+    return Object.prototype.toString.call(value) ===  "[object Boolean]" ? true : false
+  },
+
+  /**
+   * 检查一个对象是否是 日期对象
+   * @param  {*}  value      被检查的对象
+   * @return {Boolean}       如果是 Date 对象,返回 true
+   */
+  isDate: function(value) {
+    return Object.prototype.toString.call(value) ===  "[object Date]" ? true : false
+  },
+
+  /**
+   * 检查一个值 是否是 DOM 元素
+   * @param  {*}  value      被检查的值
+   * @return {Boolean}       如果是 DOM 元素,返回 true
+   */
+  isElement: function (value) {
+    return toString.call(value) === "[object HTMLBodyElement]"
+  },
+
+  /**
+   * 检查一个值是不是 空对象
+   * @param  {*}  value      被检查的值
+   * @return {Boolean}       如果是空对象,返回 true
+   */
+  isEmpty: function (value) {
+    if (value === null) {
+      return true
+    }
+    if (value.length && value.length === 0) {
+      return true
+    } else if (value.size && value.size === 0) {
+      return true
+    } else if (Object.keys(value) && Object.keys(value).length === 0) {
+      return true
+    }
+    return false
+  },
+
+  isError: function(value) {
+    return value instanceof Error === true
+  },
+
+  isFinite: function(value) {
+    return Number.isFinite(value)
+  },
+
+  isFunction: function(value) {
+    return Object.prototype.toString.call(value) ===  "[object Function]" ? true : false
+  },
+
+  isInteger: function(value) {
+    return  Number.isInteger(value)
+  },
+
+  isLength: function(value) {
+    return  isFinite(value) && value >= 0 && value === Math.floor(value) &&  value < 4294967296
+  },
+
+  isMap: function (value) {
+    return toString.call(value) === '[object Map]'
+  },
+
+  /**
+   * 深度比较object与source是否后等值的属性
+   * @param {object} object   被比较的对象
+   * @param {object} source   匹配的对象
+   * @returns {boolean}       匹配成功 返回 true
+   */
+  isMatch: function (object, source) {
+    for (let key in source) {
+        if (!my_lodash.isEqual(source[key], object[key])) {
+            return false
+        }
+    }
+    return true
+  },
+
+  /**
+   * 类似isMatch接收一个函数进行比较
+   * @param {object} object        要检查的对象
+   * @param {object} source        匹配的对象
+   * @returns {boolean} customizer 如果对象满足,返回 true
+   */
+  isMatchWith: function (object, source, customizer) {
+    let iteratee = my_lodash.iteratee(customizer)
+    for (let key in source) {
+        if (!my_lodash.isEqual(iteratee(source[key]), iteratee(object[key]))) {
+            return false
+        }
+    }
+    return true
+  },
+
+  isNaN: function(value) {
+    return  Object.prototype.toString.call(value) === "[object Number]" && isNaN(value)
+  },
+
+  isNative: function(value){
+    return (/\{\s*\[native code\]\s*\}/).test('' + value)
+  },
+
+  isNil: function(value){
+    return  Object.prototype.toString.call(value) === "[object Null]" || Object.prototype.toString.call(value) === "[object Undefined]" 
+  },
+
+  isNull: function(value){
+    return  Object.prototype.toString.call(value) === "[object Null]"
+  },
+
+  isNumber: function (value) {
+    return toString.call(value) === '[object Number]'
+  },
+
+  isObject: function (value) {
+    return value instanceof Object
+  },
+
+  isObjectLike: function (value) {
+    return typeof value === 'object' ? (!this.isNull(value)) ? true : false : false
+  },
+
+  isRegExp: function(value){
+    return  Object.prototype.toString.call(value) === "[object RegExp]"
+  },
+
+  isSafeInteger: function(value){
+    return  Number.isInteger(value) && value >= Number.MIN_SAFE_INTEGER && value <= Number.MAX_SAFE_INTEGER
+  },
+
+  isSet: function(value){
+    return  Object.prototype.toString.call(value) === "[object Set]"
+  },
+
+  isString: function(value){
+    return  Object.prototype.toString.call(value) === "[object String]"
+  },
+
+  isSymbol: function(value){
+    return  Object.prototype.toString.call(value) === "[object Symbol]"
+  },
+
+  isTypedArray: function (value) {
+    return toString.call(value) === '[object Uint8Array]'
+  },
+
+  isUndefined: function(value){
+    return  Object.prototype.toString.call(value) === "[object Undefined]"
+  },
+
+  isWeakMap: function(value){
+    return  Object.prototype.toString.call(value) === "[object WeakMap]"
+  },
+
+  isWeakSet: function(value){
+    return  Object.prototype.toString.call(value) ===  "[object WeakSet]"
+  },
+
+  lt: function (value, other) {
+    return value < other
+  },
+
+  lte: function (value, other) {
+    return value <= other
+  },
+
+  /**
+   * 将值转换为数组
+   * @param  {*} value      需要被转换的值
+   * @return {array}        返回转换后的数组
+   */
+  toArray: function (value) {
+    let result = []
+    for (let key in value) {
+      if (value.hasOwnProperty(key)) {
+        result.push(value[key])
+      }
+    }
+    return result
+  },
+
+  toFinite: function (value) {
+    return value < -Number.MAX_VALUE ? -Number.MAX_VALUE : value > Number.MAX_VALUE ? Number.MAX_VALUE : isNaN(value) ? 0 : +value
+  },
+
+  toInteger: function (value) {
+    return Math.round(my_lodash.toFinite(value))
+  },
+
+  toLength: function (value) {
+    let result = my_lodash.toInteger(value)
+    return result > 4294967295 ? 4294967295 : result < 0 ? 0 : result
+  },
+
+  toNumber: function (value) {
+    return +value
+  },
+
+  /**
+   * 分配一个或多个被分配对象可自身可枚举属性,到目标对象上，
+   * 分配的属性会覆盖目标对象身上的同名属性
+   * @param  {object} obj     目标属性
+   * @param  {...object} args 被分配的对象
+   * @return {object}         分配后的目标对象
+   */
+  assign: function (obj, ...sources) {
+    my_lodash.forEach(sources, function (func) {
+      my_lodash.forOwn(func, function (element, key) {
+        obj[key] = element
+      })
+    })
+    return obj
+  },
+
+  /**
+   * 遍历对象的可枚举自有属性
+   * @param  {object} object     被迭代的对象
+   * @param  {function} iteratee 对对象每个成员进行调用的函数
+   * @return {object}            返回一个对象
+   */
+  forOwn: function (object, iteratee = my_lodash.identity) {
+    for (let key in object) {
+      if (object.hasOwnProperty(key)) {
+        if (iteratee(object[key], key, object) === false) {
+          break
+        }
+      }
+    }
+  },
+
+  toSafeInteger: function (value) {
+    let result = +value
+    return isNaN(result) ? 0 : result > 9007199254740991 ? 9007199254740991 : result < -9007199254740991 ? -9007199254740991 : ~~result
+  },
 
 
 
@@ -1067,12 +1987,66 @@ var my_lodash = {
 
 
   /**
+   * 浅复制值,并返回
+   * @param  {*} value 被复制的值
+   * @return {*}       复制后的值
+   */
+  clone: function (value) {
+    let result
+    if (my_lodash.isDate(value)) {
+      return new Date(value.toString())
+    } else if (my_lodash.isRegExp(value)) {
+      return new RegExp(value)
+    } else if (my_lodash.isSymbol(value) || my_lodash.isString(value) || my_lodash.isBoolean(value) || my_lodash.isNumber(value)) {
+      return value
+    } else if (my_lodash.isArray(value)) {
+      result = new Array()
+    } else if (my_lodash.isArrayBuffer(value)) {
+      result = new ArrayBuffer()
+    } else if (my_lodash.isMap(value)) {
+      result = new Map()
+    } else if (my_lodash.isPlainObject(value)) {
+      result = new Object()
+    } else if (my_lodash.isSet(value)) {
+      result = new Set()
+    } else {
+      return {}
+    }
+    for (let key in value) {
+      if (value.hasOwnProperty(key)) {
+        result[key] = value[key]
+      }
+    }
+    return result
+  },
+
+  /**
+   * 与property相反,通过对象返回一个函数,函数通过参数返回结果
+   * @param  {object} object         查找的对象
+   * @return {function}              返回的函数
+   */
+  propertyOf: function (object) {
+    return function (path) {
+      let prop
+      if (my_lodash.isString(path)) {
+        prop = path.match(/\w+/g)
+      }
+      if (my_lodash.isArray(path)) {
+        prop = path
+      }
+      return my_lodash.reduce(prop, function (obj, key) {
+        return obj = obj[key]
+      }, object)
+    }
+  },
+
+  /**
    * 使用迭代器迭代集合
    * @param  {array | object} collection          被迭代的集合
    * @param  {function} [iteratee=identity]        迭代器
    * @return {*}                                   返回值
    */
-  each: function (collection, iteratee = my_lodash.identity) {
+  forEach: function (collection, iteratee = my_lodash.identity) {
     for (let key in collection) {
       if (collection.hasOwnProperty(key)) {
         if (iteratee(collection[key], key, collection) === false) {
@@ -1126,21 +2100,6 @@ var my_lodash = {
       if (!my_lodash.isEqual(values[value[name]], others[other[name]])) return false
     }
     return true
-  },
-
-  /**
-   * 执行一个深度比较,来确定object是否含有和source完全相等的属性值。与isEqual差不多,取消长度判断。
-   * @param {object} object      要检查的对象
-   * @param {object} source      匹配的对象
-   * @param {boolean} customizer 如果对象满足,返回 true
-   * @returns
-   */
-  isMatchWith: function (object, source, customizer) {
-    customizer = customizer || my_lodash.isEqual
-    let temp = Object.entries(source)
-    return temp.every(function (it) {
-      return customizer(object[it[0]], it[1], it[0], object, source)
-    })
   },
 
   /**
