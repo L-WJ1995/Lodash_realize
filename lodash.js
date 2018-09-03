@@ -1,4 +1,4 @@
-var my_lodash = {
+let my_lodash = {
 
   /**
    * 返回接收到的第一个参数
@@ -515,12 +515,11 @@ var my_lodash = {
    * @return {array}                array     返回新数组
    */
   pullAt: function(array, indexes) {
-    let ary = []
-    for (let i = 1; i < arguments.length; i++) ary.push(...arguments[i])
-    for (let j = 0; j < ary; j++) {
-      array.splice(ary[j],1)
+    let res = []
+    for (let i = indexes.length - 1; i >= 0; i--) {
+        res.unshift(array.splice(indexes[i], 1)[0])
     }
-    return array
+    return res
   },
 
   /**
@@ -843,7 +842,7 @@ var my_lodash = {
    */
   uniqWith: function (array, comparator = my_lodash.iteratee(comparator)) {
     return array.reduce((res, item) => {
-        for (var i = 0; i < res.length; i++) {
+        for (let i = 0; i < res.length; i++) {
             if (comparator(item, res[i])) {
                 break
             }
@@ -915,7 +914,7 @@ var my_lodash = {
     }
     iteratee = my_lodash.iteratee(iteratee)
     array = [].concat(...array)
-    var ary = array.map(item => item = iteratee(item))
+    let ary = array.map(item => item = iteratee(item))
     ary = ary.map((item, index) => {
         if (ary.indexOf(item) === ary.lastIndexOf(item)) {
             return true
@@ -941,7 +940,7 @@ var my_lodash = {
     iteratee = my_lodash.iteratee(iteratee)
     array = [].concat(...array)
     return array.filter((item, index) => {
-        for (var i = 0; i < array.length; i++) {
+        for (let i = 0; i < array.length; i++) {
             if (i !== index && iteratee(item, array[i])) {
                 return false
             }
@@ -1041,14 +1040,14 @@ var my_lodash = {
     }
     let ary = my_lodash.zip(...others)
     return my_lodash.map(ary, val => iteratee(...val))
-  }
+  },
 
   /**
    * 创建一个对象，
    * 将每个元素的迭代结果作为该对象的键名,该结果出现的次数,作为该对象的键值
-   * @param  {array | object} collection        被操作的集合
+   * @param  {array | object} collection             被操作的集合
    * @param  {function} iteratee= my_lodash.identity 迭代器
-   * @return {object}                           迭代出的结果
+   * @return {object}                                迭代出的结果
    */
   countBy: function (collection, iteratee = my_lodash.identity) {
     return my_lodash.reduce(collection, function (ary, val) {
@@ -1970,7 +1969,792 @@ var my_lodash = {
     return isNaN(result) ? 0 : result > 9007199254740991 ? 9007199254740991 : result < -9007199254740991 ? -9007199254740991 : ~~result
   },
 
+ /**
+   * 两数相加
+   * @param  {number} augend 加数
+   * @param  {number} addend 被加数
+   * @return {number}        和
+   */
+  add: function (augend, addend) {
+    return augend + addend
+  },
 
+  /**
+   * 根据precision（精度）向上舍入 number。
+   * @param  {number} number        原数值
+   * @param  {number} precision = 0 精度
+   * @return {number}               返回新数值
+   */
+  ceil: function (number, precision = 0) {
+    return Math.ceil(number * (10 ** precision)) / (10 ** precision)
+  },
+
+  /**
+   * 求两个值的除数
+   * @param {number} dividend 被除数
+   * @param {number} divisor  除数
+   * @returns {number}        商
+   */
+  divide: function (dividend, divisor) {
+    return dividend / divisor
+  },
+
+  /**
+   * 根据precision（精度）向上舍入 number。
+   * @param  {number} number        原数值
+   * @param  {number} precision = 0 精度
+   * @return {number}               返回新数值
+   */
+  floor: function (number, precision = 0) {
+    return Math.floor(number * (10 ** precision)) / (10 ** precision)
+  },
+
+    /**
+   * 计算数组的最大值,如果 array 为空或者 false,返回 undefined
+   * @param  {array} array 需要判断的数组
+   * @return {*}           最大值
+   */
+  max: function (array) {
+    if (array.length === 0) {
+        return undefined
+    }
+    return my_lodash.maxBy(array, it => it)
+  },
+
+  /**
+   * 通过迭代选择出数组内最大项
+   * @param {array} array                              被选数组
+   * @param {function} [iteratee = my_lodash.identity] 迭代函数
+   * @returns {*}                                      最大值
+   */
+  maxBy: function (array, iteratee = my_lodash.identity) {
+    return my_lodash.reduce(array, function (ary, val) {
+      return my_lodash.iteratee(iteratee)(ary) > my_lodash.iteratee(iteratee)(val) ? ary : val
+    })
+  },
+
+  /**
+   * 求平均数
+   * @param {array} array  求数组的平均数
+   * @returns {number}     得到的平均值
+   */
+  mean: function (array) {
+    return my_lodash.meanBy(array)
+  },
+
+  /**
+   * 通过迭代求平均数
+   * @param {array} array  求数组的平均数
+   * @returns {number}     得到的平均值
+   */
+  meanBy: function (array, iteratee = my_lodash.identity) {
+    return my_lodash.sumBy(array, iteratee) / array.length
+  },
+
+  /**
+   * 计算数组的最小值,如果 array 为空或者 false,返回 undefined
+   * @param  {array} array 需要判断的数组
+   * @return {*}           最小值
+   */
+  min: function (array) {
+    if (array.length === 0) {
+        return undefined
+    }
+    return my_lodash.minBy(array, it => it)
+  },
+
+  /**
+   * 根据迭代求出最小值
+   * @param {array} array                              被筛选数组
+   * @param {function} [iteratee = my_lodash.identity] 迭代函数
+   * @return {*}                                       最小值
+   */
+  minBy: function (array, iteratee = my_lodash.identity) {
+    return my_lodash.reduce(array, function (ary, val) {
+      return my_lodash.iteratee(iteratee)(ary) < my_lodash.iteratee(iteratee)(val) ? ary : val
+    })
+  },
+
+  /**
+   * 
+   * 两数相乘
+   * @param {number} multiplier     乘数
+   * @param {number} multiplicand   乘数
+   * @returns {number}              乘积
+   */
+  multiply: function (multiplier, multiplicand) {
+    return multiplier * multiplicand
+  },
+
+  /**
+   * 根据 precision（精度） 四舍五入 number。
+   * @param  {number} number        原数值
+   * @param  {number} precision = 0 精度
+   * @return {number}               返回新数值
+   */
+  round: function (number, precision = 0) {
+    let pre = 10 ** precision
+    return Math.round(number * pre) / pre
+  },
+
+  /**
+   * 
+   * 两数相减
+   * @param {number} minuend     被减数
+   * @param {number} subtrahend  减数
+   * @returns {number}           被减数
+   */
+  subtract: function (minuend, subtrahend) {
+    return minuend - subtrahend
+  },
+
+  /**
+   * 计算集合总和
+   * @param {array} array  被叠加的集合
+   * @returns {number}     总和
+   */
+  sum: function (array) {
+    return my_lodash.sumBy(array)
+  },
+
+  /**
+   * 通过迭代计算集合总和
+   * @param {array} array                              被叠加的集合
+   * @param {function} [iteratee = my_lodash.identity] 迭代函数
+   * @returns {number}                                 总和
+   */
+  sumBy: function (array, iteratee = my_lodash.identity) {
+    return my_lodash.reduce(array, function (ary, val) {
+      return ary + my_lodash.iteratee(iteratee)(val)
+    }, 0)
+  },
+
+  /**
+   * 
+   * 限制 number
+   * @param {number} number    被限制的数
+   * @param {number} lower     下限
+   * @param {number} upper     上限
+   * @returns {number}         返回被限制的值
+   */
+  clamp: function (number, ...args) {
+    if (args.length == 1) {
+      return number > args[0] ? args[0] : number
+    } else {
+      return number > args[1] ? args[1] : number < args[0] ? args[0] : number
+    }
+  },
+
+  /**
+   * 检查 值 是否在区间内
+   * @param {number} number  被检查值
+   * @param {number} start   下限
+   * @param {number} end     上限
+   * @returns {number}       如果在,返回 true
+   */
+  inRange: function (number, start, end) {
+    if (end === undefined) {
+      end = start
+      start = 0
+    }
+    if (start > end) {
+      let temp = start
+      start = end
+      end = temp
+    }
+    return number < start ? false : number >= end ? false : true
+  },
+
+  /**
+   * 生成规定范围内的随机数
+   * @param {number}  lower    下限
+   * @param {number}  upper    上限
+   * @param {boolean} floating 是否返回浮点数
+   * @return {number}          随机数
+   */
+  random: function (...args) {
+    let lower, upper, floating
+    if (args.length === 1) {
+      lower = 0
+      upper = args[0]
+      floating = true
+    } else if (args.length === 2) {
+      if (this.isNumber(args[1])) {
+        lower = args[0]
+        upper = args[1]
+        floating = true
+      } else {
+        lower = 0
+        upper = args[0]
+        floating = args[1]
+      }
+    } else {
+      lower = args[0]
+      upper = args[1]
+      floating = args[2]
+    }
+    let result = Math.random() * (upper - lower) + lower
+    return floating ? result : parseInt(result)
+  },
+
+  /**
+   * 分配一个或者多个被分配对象自身 或者 继承到的 可枚举属性,到目标对象上，
+   * 分配的属性会覆盖目标身上的同名属性
+   * @param  {object} obj      目标属性
+   * @param  {...sources} args 被分配的对象
+   * @return {object}          分配后的目标对象
+   */
+  assignIn: function (obj, ...sources) {
+    my_lodash.forEach(sources, function (a) {
+      for (let key in a) {
+        obj[key] = a[key]
+      }
+    })
+    return obj
+  },
+
+  /**
+   * 创建一个数组,成员是 path 的路径对应的值
+   * @param {object} object          被迭代的对象
+   * @param {string | string[]} path 路径
+   * @returns {array}                值的数组
+   */
+  at: function (object, ...path) {
+    let obj = [].concat(path).map(l_wj1995.toPath)
+    return obj.map(item => l_wj1995.get(object, item))
+  },
+
+  /**
+   * 将源对象的可枚举自有属性分配到目标对象上，
+   * 目标对象上已有的键值不能被覆盖
+   * @param  {object} object     目标对象
+   * @param  {...object} sources 源对象
+   * @return {object}            修改后的目标对象
+   */
+  defaults: function (object, ...sources) {
+    sources.forEach(function (obj) {
+      for (let key in obj) {
+        if (obj.hasOwnProperty(key) && !(key in object)) {
+          object[key] = obj[key]
+        }
+      }
+    })
+    return object
+  },
+
+  /**
+   * 递归分配属性
+   * 目标对象上已有的键值不能被覆盖
+   * @param  {object} object     目标对象
+   * @param  {...object} sources 源对象
+   * @return {object}            修改后的目标对象
+   */
+  defaultsDeep: function (object, ...sources) {
+    sources.forEach(function (obj) {
+      for (let key in obj) {
+        if (typeof object[key] === 'object' && typeof obj[key] === 'object') {
+          my_lodash.defaultsDeep(object[key], obj[key])
+        } else if (obj.hasOwnProperty(key) && !(key in object)) {
+          object[key] = obj[key]
+        }
+      }
+    })
+    return object
+  },
+
+  /**
+   * 迭代集合元素,返回第一个 返回 true 的元素键名
+   * @param  {array | object} collection                被迭代的集合
+   * @param  {function} [predicate = my_lodash.identity]     判定条件
+   * @param  {Number} [fromIndex=0]                     判定起始位置
+   * @return {*}                                        第一个判定成功的元素的键名
+   */
+  findKey: function (collection, predicate = my_lodash.identity) {
+    for (let key in collection) {
+      if (collection.hasOwnProperty(key)) {
+        if (my_lodash.iteratee(predicate)(collection[key], key, collection)) {
+          return key
+        }
+      }
+    }
+  },
+
+  /**
+   * 从右往左迭代成员,返回第一个满足的成员的键名
+   * @param  {array | object} collection               被迭代的集合
+   * @param  {function} predicate = my_lodash.identity      迭代器
+   * @param  {number} fromIndex = collection.length-1  索引起始位置
+   * @return {*}                                       满足条件的第一个成员的键名,未找到返回 undefined
+   */
+  findLastKey: function (collection, predicate = my_lodash.identity) {
+    let keys = Object.keys(collection)
+    for (let i = keys.length - 1; i >= 0; i--) {
+      if (my_lodash.iteratee(predicate)(collection[keys[i]])) {
+        return keys[i]
+      }
+    }
+  },
+
+  /**
+   * 通過 iteratee 迭代对象的可枚举和不可枚举对象
+   * @param {object} object                       被迭代的对象
+   * @param {function} [iteratee = my_lodash.identity] 迭代器
+   * @returns {object}                            返回原对象
+   */
+  forIn: function (object, iteratee = my_lodash.identity) {
+    for (let key in object) {
+      iteratee(object[key], key, object)
+    }
+    return object
+  },
+
+  /**
+   * 通過 iteratee 反向迭代对象的可枚举和不可枚举对象
+   * @param {object} object                       被迭代的对象
+   * @param {function} [iteratee = my_lodash.identity] 迭代器
+   * @returns {object}                            返回原对象
+   */
+  forInRight: function (object, iteratee = my_lodash.identity) {
+    let keys = []
+    for (let key in object) {
+      keys.push(key)
+    }
+    for (let i = keys.length - 1; i >= 0; i--) {
+      iteratee(object[keys[i]], keys[i], object)
+    }
+    return object
+  },
+
+  /**
+   * 通過 iteratee 反向迭代对象的可枚举和不可枚举对象
+   * @param {object} object                            被迭代的对象
+   * @param {function} [iteratee = my_lodash.identity] 迭代器
+   * @returns {object}                                 返回原对象
+   */ 
+  forOwnRight: function (object, iteratee = my_lodash.identity) {
+    let keys = []
+    for (let key in object) {
+      if (object.hasOwnProperty(key)) {
+        keys.push(key)
+      }
+    }
+    for (let i = keys.length - 1; i >= 0; i--) {
+      iteratee(object[keys[i]], keys[i], object)
+    }
+    return object
+  },
+
+  /**
+   * 列举对象中所有自有方法 
+   * @param {object} object 被列举的对象
+   * @returns {array}       返回函数名数组
+   */
+  functions: function (object) {
+    let result = []
+    if (object === null) {
+      return result
+    } else {
+      for (let key in object) {
+        if (object.hasOwnProperty(key) && my_lodash.isFunction(object[key])) {
+          result.push(key)
+        }
+      }
+    }
+    return result
+  },
+
+  /**
+   * 列举对象中所有自有和继承方法 
+   * @param {object} object 被列举的对象
+   * @returns {array}       返回函数名数组
+   */
+  functionsIn: function (object) {
+    let result = []
+    if (object === null) {
+      return result
+    } else {
+      for (let key in object) {
+        if (my_lodash.isFunction(object[key])) {
+          result.push(key)
+        }
+      }
+    }
+    return result
+  },
+
+  /**
+   * 根据路径获取值
+   * 
+   * @param {object} object       被检索的对象
+   * @param {array | string} path 路径
+   * @param {*} defaultValue      如果解析 undefined,返回该值
+   * @returns {*}                 解析出来的值
+   */
+  get: function (object, path, defaultValue) {
+    if (my_lodash.isString(path)) {
+      path = path.split(/[\[\]\.]/).filter(it => it !== '')
+    }
+    let result = path.reduce(function (ary, val) {
+      return ary === undefined ? ary : ary[val]
+    }, object)
+    return result === undefined ? defaultValue : result
+  },
+
+  /**
+   * 判断给定路径是否在对象自身上存在,且可枚举
+   * @param  {object}  object         被查找的对象
+   * @param  {array | string}  path   给定的路径
+   * @return {Boolean}                如果存在,返回 true
+   */
+  has: function (object, path) {
+    let prop
+    if (my_lodash.isString(path)) {
+      prop = path.match(/\w+/g)
+    } else {
+      prop = path
+    }
+    let temp = object
+    for (let i = 0; i < prop.length; i++) {
+      if (temp.hasOwnProperty(prop[i])) {
+        temp = temp[prop[i]]
+      } else {
+        return false
+      }
+    }
+    return true
+  },
+
+  /**
+   * 检查 path 是否是对象的继承和直接属性
+   * @param {object} object       检索对象
+   * @param {array | string} path 检查的路径
+   * @returns {boolean}           存在,返回 true
+   */
+  hasIn: function (object, path) {
+    if (my_lodash.isString(path)) {
+      path = path.split(/[\[\]\.]/).filter(it => it !== '')
+    }
+    let result = path.reduce(function (ary, val) {
+      return ary === undefined ? ary : ary[val]
+    }, object)
+    return result === undefined ? false : true
+  },
+
+  /**
+   * 创建一个 object 键值倒置后的对象
+   * @param {object} object 被倒置的对象
+   * @returns {object}      倒置后的对象
+   */
+  invert: function (object) {
+    let result = {}
+    for (let key in object) {
+      result[object[key]] = key
+    }
+    return result
+  },
+
+  /**
+   * 进过迭代函数,返回键值倒置,值为数组的对象
+   * @param {object} object                            被倒置的对象
+   * @param {function} [iteratee = my_lodash.identity] 倒置后的对象
+   * @returns
+   */
+  invertBy: function (object, iteratee = my_lodash.identity) {
+    let result = {},
+      tempKey
+    for (let key in object) {
+      tempKey = iteratee(object[key], key, object)
+      if (result[tempKey] === undefined) {
+        result[tempKey] = [key]
+      } else {
+        result[tempKey].push(key)
+      }
+    }
+    return result
+  },
+
+  /**
+   * 转化 value 为属性路径的数组 
+   * @param {*} value  要转换的值 
+   * @returns          返回包含属性路径的数组
+   */
+  toPath: function(value) {
+    return value.match(/[^\.\[\] ]+/g)
+  },
+
+  /**
+   * 调用object对象path上的方法
+   * @param {object} object 调用的对象
+   * @param {path}          用来调用的方法路径
+   * @param {...args}       调用的方法的参数  
+   * @returns               返回调用方法的结果
+   */
+  invoke: function(object, path, ...args) {
+      path = my_lodash.toPath(path)
+      let iteratee = path.pop()
+      return my_lodash.get(object, path)[iteratee](...args)
+  },
+
+  /**
+   * 创建一个包含所给对象所有的可枚举自有属性的数组
+   * @param  {object} object 被枚举的对象
+   * @return {array}         包含所给对象的所有可枚举自有属性的数组
+   */
+  keys: function (object) {
+    let obj = Object(object)
+    let result = []
+     my_lodash.forOwn(object, function (value, key) {
+      result.push(key)
+    })
+    return result
+  },
+
+  /**
+   * 创建一个包含所给对象所有的可枚举属性的数组
+   * @param  {object} object 被枚举的对象
+   * @return {array}         包含所给对象的所有可枚举自有属性的数组
+   */
+  keysIn: function (object) {
+    let result = []
+    for (let key in object) {
+      result.push(key)
+    }
+    return result
+  },
+
+
+  mapKeys: function(object, iteratee = my_lodash.identity) {
+      iteratee = my_lodash.iteratee(iteratee)
+      let map = {}
+      for (let key in object) {
+          map[iteratee(object[key], key, object)] = object[key]
+      }
+      return map
+  },
+
+  mapValues(object, iteratee = my_lodash.identity) {
+    iteratee = my_lodash.iteratee(iteratee)
+    let map = {}
+    for (let key in object) {
+        map[key] = iteratee(object[key], key, object)
+    }
+    return map
+  },
+
+  /**
+   * 通过给定路径返回给定对象的值,如果值是函数,返回调用的结果
+   * 如果返回值是 undefined ，返回 defaultValue
+   * @param  {object} object               被查找的对象
+   * @param  {array | string} path         查找的路径
+   * @param  {*} defaultValue              替代返回值是 undefined 的值
+   * @return {*}                           得到的值
+   */
+  result: function (object, path, defaultValue) {
+    let result = my_lodash.property(path)(object)
+    result = result === undefined ? defaultValue : result
+    if (my_lodash.isFunction(result)) {
+      return result.call(object)
+    }
+    return result
+  },
+
+  /**
+   * 将对象的值放入数组返回
+   * @param  {object} object 被处理的数组
+   * @return {array}         提取后的数组
+   */
+  values: function (object) {
+    let result = []
+    for (let key in object) {
+      if (object.hasOwnProperty(key)) {
+        result.push(object[key])
+      }
+    }
+    return result
+  },
+
+  /**
+   * 将字符串中的 '&' '<' '>' "'" '"' 转换成对应的 HTML 实体
+   * @param  {string} string 待转换的字符串
+   * @return {string}        转换后的字符串
+   */
+  escape: function (string = '') {
+    return string.replace(/[\&\<\>\'\"]/g, function (char) {
+      switch (char) {
+        case '&':
+          return '&amp;'
+        case '<':
+          return '&lt;'
+        case '>':
+          return '&gt;'
+        case "'":
+          return '&acute;'
+        case '"':
+          return '&quot;'
+        default:
+          return ''
+      }
+    })
+  },
+
+  /**
+   * 返回一个函数,将传入的参数颠倒调用
+   * @param  {function} func 被调用的函数
+   * @return {function}      调整后的函数
+   */
+  flip: function (func) {
+    return function (...args) {
+      return func(...my_lodash.reverse(args))
+    }
+  },
+
+  /**
+   * 创建一个返回值的函数
+   * @param  {*} value      被新函数返回的值
+   * @return {function}     新的函数
+   */
+  constant: function (value) {
+    return function () {
+      return value
+    }
+  },
+
+  /**
+   * 深度复制
+   * @param  {*} value  被复制的值
+   * @return {*}        复制后的值
+   */
+  cloneDeep: function (value) {
+    let result
+    if (my_lodash.isDate(value)) {
+      return new Date(value.toString())
+    } else if (my_lodash.isRegExp(value)) {
+      return new RegExp(value)
+    } else if (my_lodash.isSymbol(value) || my_lodash.isString(value) || my_lodash.isBoolean(value) || my_lodash.isNumber(value)) {
+      return value
+    } else if (my_lodash.isArray(value)) {
+      result = new Array()
+    } else if (my_lodash.isArrayBuffer(value)) {
+      result = new ArrayBuffer()
+    } else if (my_lodash.isMap(value)) {
+      result = new Map()
+    } else if (my_lodash.isPlainObject(value)) {
+      result = new Object()
+    } else if (my_lodash.isSet(value)) {
+      result = new Set()
+    } else {
+      return {}
+    }
+    for (let key in value) {
+      if (value.hasOwnProperty(key)) {
+        result[key] = my_lodash.cloneDeep(value[key])
+      }
+    }
+    return result
+  },
+
+  /**
+   * 返回一个新函数,原函数只接受一个参数,多余的参数忽略
+   * @param {any} func 被消减参数的函数
+   * @returns          新的函数
+   */
+  unary: function (func) {
+    return my_lodash.ary(func, 1)
+  },
+
+  /**
+   * 创建一个否定 func 结果的函数,并绑定 this
+   * @param  {function} predicate 被否定的函数
+   * @return {function}           新建的函数
+   */
+  negate: function (predicate) {
+    return function (...arg) {
+      return !predicate(...arg)
+    }
+  },
+
+  /**
+   * 创建一个限制多次调用 func 的函数，对于重复调用 func，只返回 第一次调用的值
+   * @param  {function} func 被限制的函数
+   * @return {function}      限制后的函数
+   */
+  once: function (func) {
+    return my_lodash.before(1, func.bind(this))
+  },
+
+  spread: function (func, start = 0) {
+    return function (arg) {
+      return func.apply(null, arg)
+    }
+  },
+
+  /**
+   * 参数绑定
+   * @param  {function} func      需要参数绑定的函数
+   * @param  {...*} ...partials   被绑定的参数
+   * @return {function}           绑定后的函数
+   */
+  partial: function (func, ...partials) {
+    return function (...args) {
+      partials = my_lodash.map(partials, function (it) {
+        if (it === _) {
+          return args.shift()
+        } else {
+          return it
+        }
+      })
+      return func(...partials, ...args)
+    }
+  },
+
+  /**
+   * 缓存计算结果，二次调用时，直接返回缓存中的数据
+   * @param  {function} func     被缓存的值的函数
+   * @param  {function} resolver 缓存键名迭代方法
+   * @return {function}
+   */
+  memoize: function (func, resolver) {
+    let cache = new Map()
+    return function fn(...args) {
+      fn.cache = cache
+      let key = (resolver ? resolver.apply(null, ...args) : args[0])
+      if (cache.has(key)) {
+        return cache.get(key)
+      } else {
+        cache.set(key, func.apply(null, ...args))
+        return cache.get(key)
+      }
+    }
+  },
+
+  /**
+   * 生成唯一的 ID，如果有前缀，附上前缀
+   * @param  {*} value      前缀
+   * @return {array}        ID
+   */
+  uniqueId: () => {return (function () {
+      let uniqueIdCount = 0
+      return function (prefix = '') {
+        uniqueIdCount++
+        return prefix + uniqueIdCount
+      }
+    })()
+  },
+
+  /**
+   * 调用迭代器 n 次，并将调用的结果以数组的形式返回，
+   * 迭代器只传一个参数：循环的指针数
+   * @param  {number} n          需要调用的次数
+   * @param  {function} iteratee 被调用的迭代器
+   * @return {array}             迭代出的结果集
+   */
+  times: function (n, iteratee = my_lodash.identity) {
+    let result = []
+    for (let i = 0; i < n; i++) {
+      result.push(iteratee(i))
+    }
+    return result
+  },
 
 
 
