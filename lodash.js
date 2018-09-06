@@ -2214,17 +2214,6 @@ let my_lodash = {
   },
 
   /**
-   * 创建一个数组,成员是 path 的路径对应的值
-   * @param {object} object          被迭代的对象
-   * @param {string | string[]} path 路径
-   * @returns {array}                值的数组
-   */
-  at: function (object, ...path) {
-    let obj = [].concat(path).map(l_wj1995.toPath)
-    return obj.map(item => l_wj1995.get(object, item))
-  },
-
-  /**
    * 将源对象的可枚举自有属性分配到目标对象上，
    * 目标对象上已有的键值不能被覆盖
    * @param  {object} object     目标对象
